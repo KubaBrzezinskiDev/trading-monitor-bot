@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.example
+*.js.map
+trades.csv
+dashboard-state.json
+positions.json
+research.json
+logs/
+.claude/

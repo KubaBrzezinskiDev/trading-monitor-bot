@@ -1,0 +1,39 @@
+{
+  "name": "trading-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:flow": "cross-env DRY_RUN=true tsx src/utils/testFlow.ts",
+    "research": "cross-env DRY_RUN=true tsx src/utils/tokenResearch.ts",
+    "dashboard:build": "node scripts/build-dashboard.mjs",
+    "dashboard": "npm run dashboard:build && electron dist/dashboard/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Solana trading bot powered by Claude AI",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.97.1",
+    "@solana/web3.js": "^1.98.4",
+    "dotenv": "^17.4.2",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^42.2.0",
+    "electron-builder": "^26.8.1",
+    "esbuild": "^0.28.0",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}
