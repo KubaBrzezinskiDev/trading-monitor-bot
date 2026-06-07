@@ -96,7 +96,7 @@ CLAUDE_MIN_CONFIDENCE=70   # Min confidence score to buy (0-100)
 # Development (no real transactions)
 npm run dev
 
-# Production (real money — tylko gdy bot działa poprawnie)
+# Production
 DRY_RUN=false npm start
 ```
 
@@ -152,37 +152,15 @@ Bot automatically skips token if:
 
 | Service | Plan | Cost |
 |---|---|---|
-| Helius RPC | Free | $0/mies |
-| Anthropic API (Haiku) | ~500 calls/day | ~$15/mies |
-| VPS hosting | DigitalOcean basic | $6/mies |
-| **Total** | | **~$21/mies** |
+| Helius RPC | Free | $0/m |
+| Anthropic API (Haiku) | ~500 calls/day | ~$15/m |
+| VPS hosting | DigitalOcean basic | $6/m |
+| **Total** | | **~$21/m** |
 
-## Development phases
-
-```
-Faza 1 — Build & test on devnet (DRY_RUN=true)
-  ✓ Token detection works
-  ✓ Claude responses parsed correctly
-  ✓ Trade logic correct (no real money)
-
-Faza 2 — Mainnet with tiny amounts (DRY_RUN=false, 0.001 SOL)
-  ✓ Real transactions execute
-  ✓ TP/SL triggers correctly
-  ✓ Logging works
-
-Faza 3 — Scale up if profitable
-  ✓ Increase buy amount
-  ✓ Upgrade to paid RPC if needed
-  ✓ Tune Claude confidence threshold
-```
 
 ## Important warnings
 
-> **NIGDY nie uruchamiaj z DRY_RUN=false dopóki bot nie działa poprawnie przez co najmniej tydzień w trybie symulacji.**
-
-> **Traktuj każdą zainwestowaną kwotę jako potencjalnie straconą. Memecoiny to wysokie ryzyko.**
-
-> **Zarobki z krypto podlegają podatkowi Belki (19%) — prowadź ewidencję transakcji.**
+> **This bot was used to simulate and monitor memecoins prices. It's not optimized for making a profit
 
 ## Resources
 
