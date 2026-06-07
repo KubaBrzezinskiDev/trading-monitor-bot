@@ -14,8 +14,9 @@ function buildWsUrl(): string {
 
 const PUMPFUN_WS_URL = buildWsUrl();
 
-const RECONNECT_BASE_MS = 10_000;  // start at 10s
-const RECONNECT_MAX_MS  = 120_000; // cap at 2 min
+const RECONNECT_BASE_MS = 1_000;  // start at 1s
+const RECONNECT_MAX_MS  = 30_000; // cap at 30s
+const STABLE_CONNECTION_MS = 10_000; // reset backoff only after this much uptime
 const INACTIVITY_TIMEOUT_MS = 30_000; // reconnect if no message for 30s
 
 export interface TokenLaunchEvent {
@@ -61,15 +62,15 @@ function handleMessage(raw: string, onToken: TokenHandler): void {
   });
 }
 
-// Returns true if the WebSocket opened at least once (connection was established),
-// false if it never connected (e.g. network error before "open").
-async function connect(onToken: TokenHandler): Promise<boolean> {
+// Returns { opened, liveDuration } where liveDuration is ms the connection was alive (0 if never opened).
+async function connect(onToken: TokenHandler): Promise<{ opened: boolean; liveDuration: number }> {
   return new Promise((resolve) => {
     logger.info(`Connecting to Pump.fun WebSocket: ${PUMPFUN_WS_URL}`);
 
     const ws = new WebSocket(PUMPFUN_WS_URL);
     let done = false;
     let opened = false;
+    let openedAt = 0;
 
     const finish = (reason: string) => {
       if (done) return;
@@ -77,7 +78,8 @@ async function connect(onToken: TokenHandler): Promise<boolean> {
       clearInterval(inactivityTimer);
       logger.warn(`${reason}. Will reconnect...`);
       try { ws.close(); } catch { /* already closed */ }
-      resolve(opened);
+      const liveDuration = opened ? Date.now() - openedAt : 0;
+      resolve({ opened, liveDuration });
     };
 
     // Inactivity watchdog — reconnect if no message arrives for INACTIVITY_TIMEOUT_MS
@@ -90,6 +92,7 @@ async function connect(onToken: TokenHandler): Promise<boolean> {
 
     ws.addEventListener("open", () => {
       opened = true;
+      openedAt = Date.now();
       logger.info("Pump.fun WebSocket connected. Subscribing to new tokens...");
       lastMessageAt = Date.now();
       ws.send(JSON.stringify({ method: "subscribeNewToken" }));
@@ -123,14 +126,14 @@ export async function startPumpFunDetector(onToken: TokenHandler): Promise<never
   let streakStartAt: number | null = null;
 
   while (true) {
-    const connected = await connect(onToken);
+    const { opened: connected, liveDuration } = await connect(onToken);
 
-    if (connected) {
-      // Session opened (even if it later dropped) — reset everything
+    if (connected && liveDuration >= STABLE_CONNECTION_MS) {
+      // Connection stayed alive long enough — reset backoff
       reconnectDelay = RECONNECT_BASE_MS;
       failStreak     = 0;
       streakStartAt  = null;
-    } else {
+    } else if (!connected) {
       // Never opened — count toward rapid-fail streak
       failStreak++;
       if (streakStartAt === null) streakStartAt = Date.now();
@@ -151,7 +154,7 @@ export async function startPumpFunDetector(onToken: TokenHandler): Promise<never
       }
     }
 
-    logger.info(`Reconnecting in ${reconnectDelay / 1000}s...`);
+    logger.info(`Reconnecting in ${reconnectDelay / 1_000}s (backoff delay)...`);
     await sleep(reconnectDelay);
   }
 }

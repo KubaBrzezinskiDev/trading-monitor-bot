@@ -9,11 +9,11 @@ New token on Pump.fun
         ↓
 Collect token data (holders, liquidity, supply distribution)
         ↓
-Claude API — scam detection & buy decision
+Claude API - scam detection & buy decision
         ↓
 [BUY] Jupiter API executes swap
         ↓
-Price monitor — auto sell on TP or SL
+Price monitor - auto sell on TP or SL
 ```
 
 ## Stack
@@ -38,7 +38,7 @@ src/
 │   ├── scamDetector.ts   # Pre-filter obvious scams before Claude call
 │   └── prompt.ts         # Prompt templates for Claude
 ├── trader/
-│   ├── jupiter.ts        # Jupiter API — swap execution
+│   ├── jupiter.ts        # Jupiter API - swap execution
 │   └── wallet.ts         # Solana wallet management
 ├── monitor/
 │   ├── priceMonitor.ts   # Watch price after purchase
@@ -132,7 +132,7 @@ Claude responds with:
 
 Bot only buys if `buy: true` AND `confidence >= CLAUDE_MIN_CONFIDENCE`.
 
-## Pre-filters (before Claude call — saves API costs)
+## Pre-filters (before Claude call - saves API costs)
 
 Bot automatically skips token if:
 - Creator holds >50% of supply
@@ -157,10 +157,14 @@ Bot automatically skips token if:
 | VPS hosting | DigitalOcean basic | $6/m |
 | **Total** | | **~$21/m** |
 
+## Known limitations
+- Helius free tier latency (~400ms) makes real-time trading impractical
+- Pump.fun WebSocket API changes frequently without notice - endpoint may break
+- TP/SL logic has a race condition on fast-moving tokens (async evaluation delay)
 
 ## Important warnings
 
-> **This bot was used to simulate and monitor memecoins prices. It's not optimized for making a profit
+> ** This bot was used to simulate and monitor memecoins prices. It's not optimized for making a profit
 
 ## Resources
 
